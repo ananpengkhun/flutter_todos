@@ -8,7 +8,7 @@ class MapPage extends StatefulWidget {
   }
 }
 
-class _MapPageState extends State<MapPage> {
+class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin<MapPage>{
   GoogleMapController _googleMapController;
 
   @override
@@ -30,4 +30,7 @@ class _MapPageState extends State<MapPage> {
   _mapTab(LatLng a) {
     _googleMapController.addMarker(MarkerOptions(position: a));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

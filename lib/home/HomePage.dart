@@ -24,10 +24,43 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-
-      margin:EdgeInsets.all(100.0),
-      child: Text("asdasdadasdasdasdasd"),
-    );
+        child: FutureBuilder<List<User>>(
+      future: _fetchUser(),
+      builder: (context, snap) {
+        if (snap.hasData) {
+          return ListView.builder(
+            itemBuilder: (BuildContext context, int index) {
+              return GestureDetector(
+                onTap: () => _pressItem(snap.data[index]),
+                child: Card(
+                  margin: EdgeInsets.all(10.0),
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: Image.network(snap.data[index].avatartUrl,
+                                width: 50.0),
+                          ),
+                          Text(snap.data[index].name)
+                        ],
+                      ),
+                      Text(snap.data[index].followersUrl),
+                      Divider()
+                    ],
+                  ),
+                ),
+              );
+            },
+            itemCount: snap.data.length,
+          );
+        }
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    ));
   }
 
   Future<List<User>> _fetchUser() async {

@@ -7,90 +7,99 @@ import './map/MapPage.dart';
 import './setting/SettingPage.dart';
 
 class MainPage extends StatefulWidget {
-  MainPage();
-
-  factory MainPage.forDesignTime() {
-    // TODO: add arguments
-    return new MainPage();
-  }
-
   @override
   State<StatefulWidget> createState() {
     return _MainPageState();
   }
 }
 
-class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0;
-  var _pageController = PageController(initialPage: 0);
+class _MainPageState extends State<MainPage>
+    with SingleTickerProviderStateMixin {
+  String _title = "Home";
+  TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 5, vsync: this);
+    _tabController.addListener(_handle);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _tabController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              child: PageView.builder(
-                itemBuilder: (BuildContext context, int index) {
-                  if (index == 0) {
-                    return HomePage();
-                  } else if (index == 1) {
-                    return MapPage();
-                  } else if (index == 2) {
-                    return FlagPage();
-                  } else if (index == 3) {
-                    return InfoPage();
-                  } else {
-                    return SettingPage();
-                  }
-                },
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                },
+        bottomNavigationBar: Material(
+          color: Colors.pink,
+          child: TabBar(
+            controller: _tabController,
+            tabs: <Widget>[
+              Tab(
+                child: Icon(
+                  Icons.home,
+                  color: Colors.blue,
+                ),
               ),
-            ),
+              Tab(
+                child: Icon(
+                  Icons.map,
+                  color: Colors.blue,
+                ),
+              ),
+              Tab(
+                child: Icon(
+                  Icons.flag,
+                  color: Colors.blue,
+                ),
+              ),
+              Tab(
+                child: Icon(
+                  Icons.info,
+                  color: Colors.blue,
+                ),
+              ),
+              Tab(
+                child: Icon(
+                  Icons.settings,
+                  color: Colors.blue,
+                ),
+              ),
+            ],
           ),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: [
-            BottomNavigationBarItem(
-                title: Text("Home"),
-                icon: Icon(Icons.home),
-                backgroundColor: Colors.deepPurple),
-            BottomNavigationBarItem(
-                title: Text("Map"),
-                icon: Icon(Icons.map),
-                backgroundColor: Colors.deepPurple),
-            BottomNavigationBarItem(
-                title: Text("Flag"),
-                icon: Icon(Icons.flag),
-                backgroundColor: Colors.deepPurple),
-            BottomNavigationBarItem(
-                title: Text("Info"),
-                icon: Icon(Icons.info),
-                backgroundColor: Colors.deepPurple),
-            BottomNavigationBarItem(
-                title: Text("Settings"),
-                icon: Icon(Icons.settings),
-                backgroundColor: Colors.deepPurple)
+        body: TabBarView(
+          controller: _tabController,
+          children: <Widget>[
+            HomePage(),
+            MapPage(),
+            FlagPage(),
+            InfoPage(),
+            SettingPage()
           ],
-          onTap: _onItemTab,
-          currentIndex: _currentIndex,
         ),
       ),
     );
   }
 
-  void _onItemTab(int index) {
-    _pageController.animateToPage(index,
-        duration: Duration(milliseconds: 300), curve: Curves.ease);
+  void _handle() {
     setState(() {
-      _currentIndex = index;
+      if (_tabController.index == 0) {
+        _title = "Home";
+      } else if (_tabController.index == 1) {
+        _title = "Map";
+      } else if (_tabController.index == 2) {
+        _title = "Flash";
+      } else if (_tabController.index == 3) {
+        _title = "Info";
+      } else {
+        _title = "Settings";
+      }
     });
   }
 }
