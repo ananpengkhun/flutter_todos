@@ -1,86 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'dart:convert';
+import 'package:scoped_model/scoped_model.dart';
 
 import './model/user.dart';
 import './UserDetail.dart';
+import './viewmodel/HomeViewModel.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage();
-
-  factory HomePage.forDesignTime() {
-    // TODO: add arguments
-    return new HomePage();
-  }
 
   @override
   State<StatefulWidget> createState() {
-    return _HomePageState();
+    return HomePageState();
   }
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage>{
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: FutureBuilder<List<User>>(
-      future: _fetchUser(),
-      builder: (context, snap) {
-        if (snap.hasData) {
-          return ListView.builder(
-            itemBuilder: (BuildContext context, int index) {
-              return GestureDetector(
-                onTap: () => _pressItem(snap.data[index]),
-                child: Card(
-                  margin: EdgeInsets.all(10.0),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: Image.network(snap.data[index].avatartUrl,
-                                width: 50.0),
+    return ScopedModelDescendant<HomeViewModel>(
+      builder: (context, child, model) {
+        return FutureBuilder<List<User>>(
+          future: model.user,
+          builder: (_, AsyncSnapshot<List<User>> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.active:
+              case ConnectionState.waiting:
+                return Center(child: CircularProgressIndicator());
+              case ConnectionState.done:
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () => _pressItem(snapshot.data[index]),
+                        child: Card(
+                          margin: EdgeInsets.all(10.0),
+                          child: Column(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: Image.network(
+                                        snapshot.data[index].avatartUrl,
+                                        width: 50.0),
+                                  ),
+                                  Text(snapshot.data[index].name)
+                                ],
+                              ),
+                              Text(snapshot.data[index].followersUrl),
+                              Divider()
+                            ],
                           ),
-                          Text(snap.data[index].name)
-                        ],
-                      ),
-                      Text(snap.data[index].followersUrl),
-                      Divider()
-                    ],
-                  ),
-                ),
-              );
-            },
-            itemCount: snap.data.length,
-          );
-        }
-        return Center(
-          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    },
+                    itemCount: snapshot.data.length,
+                  );
+                }
+            }
+          },
         );
       },
-    ));
-  }
-
-  Future<List<User>> _fetchUser() async {
-//    final response = await http.get('https://api.github.com/users');
-//    List responseDecode = json.decode(response.body);
-    return _mapObject();
-  }
-
-  List<User> _mapObject() {
-    List<User> userList = List();
-    for (int i = 0; i < 10; i++) {
-      User user = User(
-          id: i,
-          name: "name $i",
-          avatartUrl: "avatartUrl $i",
-          followersUrl: "followersUrl $i");
-      userList.add(user);
-    }
-
-    return userList;
+    );
   }
 
   _pressItem(User data) {
@@ -89,4 +76,5 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(builder: (context) => UserDetail(name: data.name)),
     );
   }
+
 }

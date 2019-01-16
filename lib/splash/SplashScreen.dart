@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 
 import './../main.dart';
+import './../home/viewmodel/HomeViewModel.dart';
+import './../manager/BaseService.dart';
+
+final HomeViewModel viewModel = HomeViewModel(homeAPi: BaseService());
 
 void main() {
-  runApp(SplashScreen());
+  runApp(SplashScreen(viewModel: viewModel));
 }
 
 class SplashScreen extends StatefulWidget {
+  final HomeViewModel viewModel;
+
+  SplashScreen({this.viewModel});
+
   @override
   State<StatefulWidget> createState() {
     return _SplashScreenState();
@@ -30,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Center(
           child: Text(
             "This's Splash Page",
-            style: TextStyle(fontSize: 30.0,fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
             textDirection: TextDirection.rtl,
           ),
         ),

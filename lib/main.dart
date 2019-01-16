@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 import './flag/FlagPage.dart';
 import './home/HomePage.dart';
 import './info/InfoPage.dart';
 import './map/MapPage.dart';
 import './setting/SettingPage.dart';
+import 'home/viewmodel/HomeViewModel.dart';
+import './manager/HomeAPi.dart';
+import './manager/BaseService.dart';
 
 class MainPage extends StatefulWidget {
+
   @override
   State<StatefulWidget> createState() {
     return _MainPageState();
@@ -17,12 +22,15 @@ class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
   String _title = "Home";
   TabController _tabController;
+  final HomeViewModel viewModel = HomeViewModel(homeAPi: BaseService());
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
     _tabController.addListener(_handle);
+
+    loadData();
   }
 
   @override
@@ -76,7 +84,10 @@ class _MainPageState extends State<MainPage>
         body: TabBarView(
           controller: _tabController,
           children: <Widget>[
-            HomePage(),
+            ScopedModel<HomeViewModel>(
+              model: viewModel,
+              child: HomePage(),
+            ),
             MapPage(),
             FlagPage(),
             InfoPage(),
@@ -101,5 +112,9 @@ class _MainPageState extends State<MainPage>
         _title = "Settings";
       }
     });
+  }
+
+  Future loadData() async {
+    await viewModel.setUser();
   }
 }
