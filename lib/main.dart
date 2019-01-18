@@ -9,9 +9,12 @@ import './setting/SettingPage.dart';
 import 'home/viewmodel/HomeViewModel.dart';
 import './manager/HomeAPi.dart';
 import './manager/BaseService.dart';
+import './setting/page/Page1.dart';
+import './setting/page/Page2.dart';
+import './setting/page/Page3.dart';
+import './setting/page/Page4.dart';
 
 class MainPage extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() {
     return _MainPageState();
@@ -22,6 +25,7 @@ class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
   String _title = "Home";
   TabController _tabController;
+  int count = 0;
   final HomeViewModel viewModel = HomeViewModel(homeAPi: BaseService());
 
   @override
@@ -42,7 +46,27 @@ class _MainPageState extends State<MainPage>
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      routes: {
+        '/page1' : (context) => Page1(),
+        '/page2': (context) => Page2(),
+        '/page3': (context) => Page3(),
+        '/page4': (context) => Page4(),
+      },
       home: Scaffold(
+        appBar: AppBar(
+          title: ScopedModel(
+            model: viewModel,
+            child: ScopedModelDescendant<HomeViewModel>(
+              builder: (context, child, model) {
+                return Text("${model.counter}");
+              },
+            ),
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _pressFloating,
+          child: Icon(Icons.exposure_plus_1),
+        ),
         bottomNavigationBar: Material(
           color: Colors.pink,
           child: TabBar(
@@ -82,6 +106,7 @@ class _MainPageState extends State<MainPage>
           ),
         ),
         body: TabBarView(
+          physics: NeverScrollableScrollPhysics(),
           controller: _tabController,
           children: <Widget>[
             ScopedModel<HomeViewModel>(
@@ -116,5 +141,9 @@ class _MainPageState extends State<MainPage>
 
   Future loadData() async {
     await viewModel.setUser();
+  }
+
+  void _pressFloating() {
+    viewModel.plus();
   }
 }

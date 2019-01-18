@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 import './../main.dart';
 import './../home/viewmodel/HomeViewModel.dart';
 import './../manager/BaseService.dart';
+import './viewmodel/SplashScreenViewModel.dart';
 
 final HomeViewModel viewModel = HomeViewModel(homeAPi: BaseService());
 
@@ -23,6 +25,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   var isSplash = true;
+  final SplashScreenViewModel viewModel = SplashScreenViewModel();
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +47,11 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
     } else {
-      return MainPage();
+      return ScopedModel<SplashScreenViewModel>(
+        model: viewModel,
+        child: MainPage(),
+      );
+
     }
   }
 }

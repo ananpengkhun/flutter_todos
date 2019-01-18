@@ -4,6 +4,7 @@ import './promotion/Promotion.dart';
 import './flashsale/FlashSale.dart';
 
 class FlagPage extends StatefulWidget {
+
   @override
   State<StatefulWidget> createState() {
     return _FlagPageState();
@@ -54,7 +55,10 @@ class _FlagPageState extends State<FlagPage>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: <Widget>[FlashSale(), Promotion()],
+        children: <Widget>[
+          FlashSale(),
+          Promotion()
+        ],
       ),
     );
   }
