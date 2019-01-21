@@ -16,7 +16,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage>
-    with AutomaticKeepAliveClientMixin<MapPage> {
+    with AutomaticKeepAliveClientMixin<MapPage>, WidgetsBindingObserver {
   Future<SharedPreferences> _share = SharedPreferences.getInstance();
   GoogleMapController _googleMapController;
   Database database;
@@ -36,10 +36,10 @@ class _MapPageState extends State<MapPage>
     if (!await Directory(dirname(path)).exists()) {
       database = await openDatabase(path, version: 1,
           onCreate: (Database db, int version) async {
-            // When creating the db, create the table
-            db.execute(
-                'CREATE TABLE Test (id INTEGER PRIMARY KEY, latitude TEXT, longtitude TEXT)');
-          });
+        // When creating the db, create the table
+        db.execute(
+            'CREATE TABLE Test (id INTEGER PRIMARY KEY, latitude DOUBLE, longtitude DOUBLE)');
+      });
     } else {
       database = await openDatabase(path);
     }
@@ -47,27 +47,10 @@ class _MapPageState extends State<MapPage>
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: queryData(),
-        builder: (context, AsyncSnapshot<List<Map>> snapshot) {
-          if (snapshot.hasData) {
-            return GoogleMap(
-              initialCameraPosition: CameraPosition(
-                  target: LatLng(13.799937, 100.54994), zoom: 17.0),
-              onMapCreated: (GoogleMapController g) {
-                _googleMapController = g;
-                snapshot.data.forEach((f) {
-                  _googleMapController.addMarker(MarkerOptions(
-                      position: LatLng(double.parse(f['latitude']),
-                          double.parse(f['longtitude']))));
-                });
-
-                _googleMapController.onMapTapped.add(_mapTab);
-              },
-            );
-          }
-          return Center(child: CircularProgressIndicator());
-        });
+    return GoogleMap(
+        initialCameraPosition:
+            CameraPosition(target: LatLng(13.799937, 100.54994), zoom: 17.0),
+        onMapCreated: _onMapCreated);
   }
 
   Future<List<Map>> queryData() async {
@@ -77,8 +60,7 @@ class _MapPageState extends State<MapPage>
   insertLatLng(LatLng a) async {
     await database.transaction((txn) async {
       int id1 = await txn.rawInsert(
-          'INSERT INTO Test(latitude, longtitude) VALUES(${a.latitude},${a
-              .longitude})');
+          'INSERT INTO Test(latitude, longtitude) VALUES(${a.latitude},${a.longitude})');
       print('inserted1: $id1');
     });
   }
@@ -90,6 +72,50 @@ class _MapPageState extends State<MapPage>
   _mapTab(LatLng a) {
     insertLatLng(a);
     _addMaker(a);
+  }
+
+  _markerTapped(Marker marker) {
+    print("_markerTapped_markerTapped_markerTapped");
+    AlertDialog(
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () {},
+          child: Text("OK"),
+        ),
+        FlatButton(
+          child: Text("CLOSE"),
+          onPressed: () {},
+        )
+      ],
+      content: Card(
+        child: Column(
+          children: <Widget>[
+            Text(marker.id),
+          ],
+        ),
+      ),
+    );
+  }
+
+  _onMapCreated(GoogleMapController g) {
+    _googleMapController = g;
+
+    queryData().then((t) {
+      t.forEach((f) {
+        _googleMapController.addMarker(
+            MarkerOptions(position: LatLng(f['latitude'], f['longtitude'])));
+      });
+    });
+
+    _googleMapController.onMapTapped.add(_mapTab);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      database.close();
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   @override
