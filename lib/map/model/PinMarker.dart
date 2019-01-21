@@ -5,8 +5,6 @@ class PinMarker {
   PinMarker({this.latitude, this.longtitude});
 
   factory PinMarker.fromMap(Map<String, dynamic> map) {
-    return PinMarker(
-        latitude: double.parse(map['latitude']),
-        longtitude: double.parse(map['latitude']));
+    return PinMarker(latitude: map['latitude'], longtitude: map['longtitude']);
   }
 }

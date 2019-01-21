@@ -4,17 +4,16 @@ import 'package:scoped_model/scoped_model.dart';
 import './model/user.dart';
 import './UserDetail.dart';
 import './viewmodel/HomeViewModel.dart';
+import './widget/CardList.dart';
 
 class HomePage extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() {
     return HomePageState();
   }
 }
 
-class HomePageState extends State<HomePage>{
-
+class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
@@ -38,26 +37,10 @@ class HomePageState extends State<HomePage>{
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () => _pressItem(snapshot.data[index]),
-                        child: Card(
-                          margin: EdgeInsets.all(10.0),
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.all(10.0),
-                                    child: Image.network(
-                                        snapshot.data[index].avatartUrl,
-                                        width: 50.0),
-                                  ),
-                                  Text(snapshot.data[index].name)
-                                ],
-                              ),
-                              Text(snapshot.data[index].followersUrl),
-                              Divider()
-                            ],
-                          ),
-                        ),
+                        child: CardList(
+                            snapshot.data[index].avatartUrl,
+                            snapshot.data[index].name,
+                            snapshot.data[index].followersUrl),
                       );
                     },
                     itemCount: snapshot.data.length,
@@ -76,5 +59,4 @@ class HomePageState extends State<HomePage>{
       MaterialPageRoute(builder: (context) => UserDetail(name: data.name)),
     );
   }
-
 }

@@ -10,12 +10,6 @@ class BaseService extends HomeAPi {
   var baseUrl = "https://api.github.com/users";
   http.Client _client = http.Client();
 
-  set client(http.Client value) => _client = value;
-
-  static final BaseService _internal = BaseService.internal();
-  factory BaseService() => _internal;
-  BaseService.internal();
-
   Future<List<User>> getHome() async {
     var response = await _client.get('$baseUrl');
 

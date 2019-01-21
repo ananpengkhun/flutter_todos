@@ -17,6 +17,7 @@ class _InfoPageState extends State<InfoPage> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+        resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           title: Center(
             child: Text("Info"),
